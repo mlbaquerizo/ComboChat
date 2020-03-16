@@ -34,7 +34,10 @@ export default class App extends React.Component{
     }
 
     componentDidMount(){
+<<<<<<< HEAD
         console.log("HELLO WORLD");
+=======
+>>>>>>> 1768dc3cfb85ef9949c3d94320f679594e70031a
         if(this.twitch){
             this.twitch.onAuthorized((auth)=>{
                 this.Authentication.setToken(auth.token, auth.userId)
