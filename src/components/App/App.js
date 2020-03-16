@@ -34,6 +34,7 @@ export default class App extends React.Component{
     }
 
     componentDidMount(){
+        console.log("HELLO WORLD");
         if(this.twitch){
             this.twitch.onAuthorized((auth)=>{
                 this.Authentication.setToken(auth.token, auth.userId)
@@ -74,15 +75,7 @@ export default class App extends React.Component{
     render(){
         if(this.state.finishedLoading && this.state.isVisible){
             return (
-                <div className="App">
-                    <div className={this.state.theme === 'light' ? 'App-light' : 'App-dark'} >
-                        <p>Hello world!</p>
-                        <p>My token is: {this.Authentication.state.token}</p>
-                        <p>My opaque ID is {this.Authentication.getOpaqueId()}.</p>
-                        <div>{this.Authentication.isModerator() ? <p>I am currently a mod, and here's a special mod button <input value='mod button' type='button'/></p>  : 'I am currently not a mod.'}</div>
-                        <p>I have {this.Authentication.hasSharedId() ? `shared my ID, and my user_id is ${this.Authentication.getUserId()}` : 'not shared my ID'}.</p>
-                    </div>
-                </div>
+                <h1 style={{fontSize: '100px', color: "white"}}>HELLO WORLD</h1>
             )
         }else{
             return (
