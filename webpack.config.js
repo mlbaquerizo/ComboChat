@@ -1,3 +1,4 @@
+const dotenv = require('dotenv');
 const fs = require('fs')
 const path = require("path")
 const webpack = require("webpack")
@@ -8,7 +9,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 // defines where the bundle file will live
 const bundlePath = path.resolve(__dirname, "dist/")
 
-module.exports = (_env,argv)=> {
+module.exports = (_env,argv) => {
   let entryPoints = {
     VideoComponent:{
       path:"./src/VideoComponent.js",
@@ -44,11 +45,26 @@ module.exports = (_env,argv)=> {
 
   let entry = {}
 
+  // Get the root path
+  const currentPath = path.join(__dirname);
+  // Create the fallback path (the production .env)
+  const basePath = currentPath + '/.env';
+  // Check if the file exists, otherwise fall back to the production .env
+  const finalPath = basePath;
+  // Set the path parameter in the dotenv config
+  const fileEnv = dotenv.config({ path: finalPath }).parsed;
+  // reduce it to a nice object, the same as before (but with the variables from the file)
+  const envKeys = Object.keys(fileEnv).reduce((prev, next) => {
+    prev[`process.env.${next}`] = JSON.stringify(fileEnv[next]);
+    return prev;
+  }, {});
+
   // edit webpack plugins here!
   let plugins = [
     new CleanWebpackPlugin(['dist']),
-    new webpack.HotModuleReplacementPlugin()
-  ]
+    new webpack.HotModuleReplacementPlugin(),
+    new webpack.DefinePlugin(envKeys),
+  ];
 
   for(name in entryPoints){
     if(entryPoints[name].build){
