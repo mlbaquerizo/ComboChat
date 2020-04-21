@@ -116,7 +116,9 @@ export default class App extends React.Component {
     const comboCount = this.state.msgCount[this.Authentication.getUserId()] || 0;
     if (this.state.finishedLoading && this.state.isVisible) {
       return (
-        <h1 style={{ fontSize: '100px', color: "white" }}>{`COMBO: ${comboCount}`}</h1>
+        <div className="circleContainer" style={{zIndex: '1', borderRadius:'50%', width: '100px', height: '100px', background: 'lightblue'}}>
+          <h1 style={{ textAlign: 'center', fontSize: '100px', color: "white", marginBottom:'2px' }}>{comboCount}</h1>
+        </div>
       )
     } else {
       return (
