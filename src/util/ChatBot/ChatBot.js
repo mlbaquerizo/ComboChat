@@ -19,9 +19,17 @@ export default class ChatBot {
     this.client.on(topic, handler);
   }
 
+  removeHandler(topic, handler) {
+    this.client.removeListener(topic, handler);
+  }
+
   connect() {
     // Connect to Twitch
     this.client.connect();
+  }
+
+  disconnect() {
+    this.client.disconnect();
   }
 
 }
