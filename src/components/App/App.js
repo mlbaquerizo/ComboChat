@@ -1,131 +1,106 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import ComboCount from '../ComboCount';
 import Authentication from '../../util/Authentication/Authentication';
 import ChatBot from '../../util/ChatBot/ChatBot';
-
 import './App.css';
 
-export default class App extends React.Component {
-  constructor(props) {
-    super(props)
-    this.Authentication = new Authentication()
-    this.ChatBot = new ChatBot({
-      username: process.env.USERNAME,
-      password: process.env.PASSWORD,
-      channels: [process.env.CHANNEL],
-    });
+const authentication = new Authentication();
+const chatBot = new ChatBot({
+  username: process.env.USERNAME,
+  password: process.env.PASSWORD,
+  channels: [process.env.CHANNEL],
+});
 
-    //if the extension is running on twitch or dev rig, set the shorthand here. otherwise, set to null. 
-    this.twitch = window.Twitch ? window.Twitch.ext : null;
-    this.state = {
-      finishedLoading: false,
-      theme: 'light',
-      isVisible: true,
-      msgCount: {},
-    };
-  }
+export default () => {
+  const twitch = window.Twitch ? window.Twitch.ext : null;
 
-  contextUpdate(context, delta) {
-    if (delta.includes('theme')) {
-      this.setState(() => {
-        return { theme: context.theme }
-      })
+  const [finishedLoading, setFinishedLoading] = useState(false);
+  const [theme, setTheme] = useState('light');
+  const [isVisible, setIsVisble] = useState(true);
+  const [msgCount, setMsgCount] = useState({});
+
+  const contextUpdate = (context, delta) => {
+    if(delta.includes('theme')) {
+      setTheme(context.theme);
     }
-  }
+  };
 
-  visibilityChanged(isVisible) {
-    this.setState(() => {
-      return {
-        isVisible
-      }
-    })
-  }
+  const visibilityChanged = (isVisible) => {
+    setIsVisble(isVisible);
+  };
 
-  // Called every time a message comes in
-  onMessageHandler(target, context, msg, self) {
-    // ignore messages from the bot
-    if (self) {
-      return;
-    }
+  useEffect(() => {
+    if (twitch) {
+      // Called every time the bot connects to Twitch chat
+      const onConnectedHandler = (addr, port) => {
+        twitch.rig.log(`* Connected to ${addr}:${port}`);
+      };
 
-    const messageUserId = context["user-id"];
-    const userId = this.Authentication.getUserId();
-    const isChatMessage = context["message-type"] === 'chat';
-    const isCurrentUser = messageUserId === userId;
-    if(isChatMessage && isCurrentUser){
-      const { msgCount } = this.state;
+      // Called every time a message comes in
+      const onMessageHandler = (channel, userstate, msg, self) => {
+        // ignore messages from the bot
+        if (self) {
+          return;
+        }
 
-      if (msgCount[userId]) {
-        msgCount[userId] += 1;
-      } else {
-        msgCount[userId] = 1;
-      }
-  
-      this.setState({msgCount});
-    }
-    return;
-  }
+        const messageUserId = userstate["user-id"];
+        const userId = authentication.getUserId();
+        const isCurrentUser = messageUserId === userId;
 
-  // Called every time the bot connects to Twitch chat
-  onConnectedHandler (addr, port) {
-    window.Twitch.ext.rig.log(`* Connected to ${addr}:${port}`);
-  }
+        if (isCurrentUser) {
+          setMsgCount(count => {
+            return { ...count, [userId]: count[userId] ? count[userId] + 1 : 1 };
+          });
+        }
+      };
 
-  componentDidMount() {
-    if (this.twitch) {
-      this.ChatBot.setHandler('message', this.onMessageHandler.bind(this));
-      this.ChatBot.setHandler('connected', this.onConnectedHandler.bind(this));
-      this.ChatBot.connect();
-      this.twitch.onAuthorized((auth) => {
-        this.Authentication.setToken(auth.token, auth.userId)
-        if (!this.state.finishedLoading) {
+      twitch.onAuthorized((auth) => {
+        authentication.setToken(auth.token, auth.userId)
+        if (!finishedLoading) {
           // if the component hasn't finished loading (as in we've not set up after getting a token), let's set it up now.
 
           // now we've done the setup for the component, let's set the state to true to force a rerender with the correct data.
-          this.setState(() => {
-            return { finishedLoading: true }
-          })
+          setFinishedLoading(true);
         }
-      })
+      });
 
-      this.twitch.listen('broadcast', (target, contentType, body) => {
-        this.twitch.rig.log(`New PubSub message!\n${target}\n${contentType}\n${body}`)
+      twitch.listen('broadcast', (target, contentType, body) => {
+        twitch.rig.log(`New PubSub message!\n${target}\n${contentType}\n${body}`)
         // now that you've got a listener, do something with the result... 
 
         // do something...
 
-      })
+      });
 
-      this.twitch.onVisibilityChanged((isVisible, _c) => {
-        this.visibilityChanged(isVisible)
-      })
+      twitch.onVisibilityChanged((isVisible, _c) => {
+        visibilityChanged(isVisible)
+      });
 
-      this.twitch.onContext((context, delta) => {
-        this.contextUpdate(context, delta)
-      })
+      twitch.onContext((context, delta) => {
+        contextUpdate(context, delta)
+      });
+
+      chatBot.setHandler('chat', onMessageHandler);
+      chatBot.setHandler('connected', onConnectedHandler);
+      chatBot.connect();
+
+      return function cleanup() {
+        twitch.unlisten('broadcast', () => console.log('successfully unlistened'));
+        chatBot.disconnect();
+      }
     }
-  }
+  }, []);
 
-  componentWillUnmount() {
-    if (this.twitch) {
-      this.twitch.unlisten('broadcast', () => console.log('successfully unlistened'))
-    }
+  const getComboCount = () => {
+    return msgCount[authentication.getUserId()] || 0;
+  };
+  
+  if (finishedLoading && isVisible) {
+    return <ComboCount count={getComboCount()}/>;
+  } else {
+    return (
+      <div className="App">
+      </div>
+    );
   }
-
-  render() {
-    this.twitch.rig.log(`STATE: ${JSON.stringify(this.state.msgCount)}`);
-    const comboCount = this.state.msgCount[this.Authentication.getUserId()] || 0;
-    if (this.state.finishedLoading && this.state.isVisible) {
-      return (
-        <div className="circleContainer" style={{zIndex: '1', borderRadius:'50%', width: '100px', height: '100px', background: 'lightblue', paddingBottom:'15px'}}>
-          <h1 style={{ textAlign: 'center', fontSize: '100px', color: "white", marginBottom:'2px' }}>{comboCount}</h1>
-        </div>
-      )
-    } else {
-      return (
-        <div className="App">
-        </div>
-      )
-    }
-
-  }
-}
+};
