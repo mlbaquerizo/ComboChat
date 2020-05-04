@@ -1,5 +1,6 @@
 import React from 'react';
-import './countShake.css'
+import './countShake.css';
+
 const ComboCount = ({count, comboCountClass}) => {
   return (
     <div className="circleContainer" style={{zIndex: '1', borderRadius:'50%', width: '100px', height: '100px', background: 'lightblue', paddingBottom:'15px'}}>
