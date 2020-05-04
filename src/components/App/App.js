@@ -21,13 +21,13 @@ export default () => {
   const [comboCountClass, setComboCountClass] = useState('')
 
   const contextUpdate = (context, delta) => {
-    if(delta.includes('theme')) {
+    if (delta.includes('theme')) {
       setTheme(context.theme);
     }
   };
 
-  const visibilityChanged = (isVisible) => {
-    setIsVisble(isVisible);
+  const visibilityChanged = (visible) => {
+    setIsVisble(visible);
   };
 
   useEffect(() => {
@@ -45,22 +45,23 @@ export default () => {
           return;
         }
 
-        const messageUserId = userstate["user-id"];
+        const messageUserId = userstate['user-id'];
         const userId = authentication.getUserId();
         const isCurrentUser = messageUserId === userId;
 
         console.log("CLASS IN MESSAGE HANDLER: ", comboCountClass);
         if (isCurrentUser) {
-          setComboCountClass('comboShake')
-          setMsgCount(count => {
-            return { ...count, [userId]: count[userId] ? count[userId] + 1 : 1 };
-          }); 
-          setComboCountClass('comboShakeEnd')
-        } 
+          setComboCountClass('comboShake');
+          setMsgCount((count) => ({
+            ...count,
+            [userId]: count[userId] ? count[userId] + 1 : 1,
+          }));
+          setComboCountClass('comboShakeEnd');
+        }
       };
 
       twitch.onAuthorized((auth) => {
-        authentication.setToken(auth.token, auth.userId)
+        authentication.setToken(auth.token, auth.userId);
         if (!finishedLoading) {
           // if the component hasn't finished loading (as in we've not set up after getting a token), let's set it up now.
 
@@ -70,19 +71,20 @@ export default () => {
       });
 
       twitch.listen('broadcast', (target, contentType, body) => {
-        twitch.rig.log(`New PubSub message!\n${target}\n${contentType}\n${body}`)
-        // now that you've got a listener, do something with the result... 
+        twitch.rig.log(
+          `New PubSub message!\n${target}\n${contentType}\n${body}`,
+        );
+        // now that you've got a listener, do something with the result...
 
         // do something...
-
       });
 
-      twitch.onVisibilityChanged((isVisible, _c) => {
-        visibilityChanged(isVisible)
+      twitch.onVisibilityChanged((visible, _c) => {
+        visibilityChanged(visible);
       });
 
       twitch.onContext((context, delta) => {
-        contextUpdate(context, delta)
+        contextUpdate(context, delta);
       });
 
       chatBot.setHandler('chat', onMessageHandler);
@@ -92,21 +94,15 @@ export default () => {
       return function cleanup() {
         twitch.unlisten('broadcast', () => console.log('successfully unlistened'));
         chatBot.disconnect();
-      }
+      };
     }
   }, []);
 
-  const getComboCount = () => {
-    return msgCount[authentication.getUserId()] || 0;
-  };
-  
-  console.log("CLASS BEFORE RENDER: ", comboCountClass);
+  const getComboCount = () => msgCount[authentication.getUserId()] || 0;
+
   if (finishedLoading && isVisible) {
-    return <ComboCount key={Date.now()} count={getComboCount()} comboCountClass={comboCountClass}/>;
-  } else {
-    return (
-      <div className="App">
-      </div>
-    );
+    return <ComboCount  key={Date.now()} count={getComboCount()} comboCountClass={comboCountClass} />;
   }
+
+  return <div className="App" />;
 };

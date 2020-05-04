@@ -1,7 +1,7 @@
 const tmi = require('tmi.js');
 
 export default class ChatBot {
-  constructor({username, password, channels}) {
+  constructor({ username, password, channels }) {
     const opts = {
       identity: {
         username,
@@ -11,7 +11,7 @@ export default class ChatBot {
     };
 
     // Create a client with our options
-    const client = new tmi.client(opts); 
+    const client = new tmi.client(opts); // eslint-disable-line new-cap
     this.client = client;
   }
 
@@ -31,5 +31,4 @@ export default class ChatBot {
   disconnect() {
     this.client.disconnect();
   }
-
 }
