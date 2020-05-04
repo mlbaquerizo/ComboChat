@@ -54,7 +54,7 @@ export default () => {
           setComboCountClass('comboShake')
           setMsgCount(count => {
             return { ...count, [userId]: count[userId] ? count[userId] + 1 : 1 };
-          });
+          }); 
           setComboCountClass('comboShakeEnd')
         } 
       };
@@ -102,7 +102,7 @@ export default () => {
   
   console.log("CLASS BEFORE RENDER: ", comboCountClass);
   if (finishedLoading && isVisible) {
-    return <ComboCount count={getComboCount()} comboCountClass={comboCountClass}/>;
+    return <ComboCount key={Date.now()} count={getComboCount()} comboCountClass={comboCountClass}/>;
   } else {
     return (
       <div className="App">
