@@ -18,6 +18,7 @@ export default () => {
   const [theme, setTheme] = useState('light');
   const [isVisible, setIsVisble] = useState(true);
   const [msgCount, setMsgCount] = useState({});
+  const [comboCountClass, setComboCountClass] = useState('')
 
   const contextUpdate = (context, delta) => {
     if(delta.includes('theme')) {
@@ -30,6 +31,7 @@ export default () => {
   };
 
   useEffect(() => {
+    setComboCountClass('');
     if (twitch) {
       // Called every time the bot connects to Twitch chat
       const onConnectedHandler = (addr, port) => {
@@ -47,11 +49,14 @@ export default () => {
         const userId = authentication.getUserId();
         const isCurrentUser = messageUserId === userId;
 
+        console.log("CLASS IN MESSAGE HANDLER: ", comboCountClass);
         if (isCurrentUser) {
+          setComboCountClass('comboShake')
           setMsgCount(count => {
             return { ...count, [userId]: count[userId] ? count[userId] + 1 : 1 };
           });
-        }
+          setComboCountClass('comboShakeEnd')
+        } 
       };
 
       twitch.onAuthorized((auth) => {
@@ -95,8 +100,9 @@ export default () => {
     return msgCount[authentication.getUserId()] || 0;
   };
   
+  console.log("CLASS BEFORE RENDER: ", comboCountClass);
   if (finishedLoading && isVisible) {
-    return <ComboCount count={getComboCount()}/>;
+    return <ComboCount count={getComboCount()} comboCountClass={comboCountClass}/>;
   } else {
     return (
       <div className="App">
