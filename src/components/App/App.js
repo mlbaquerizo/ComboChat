@@ -49,7 +49,7 @@ export default () => {
         const userId = authentication.getUserId();
         const isCurrentUser = messageUserId === userId;
 
-        console.log("CLASS IN MESSAGE HANDLER: ", comboCountClass);
+        
         if (isCurrentUser) {
           setComboCountClass('comboShake');
           setMsgCount((count) => ({
