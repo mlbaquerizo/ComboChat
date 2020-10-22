@@ -19,7 +19,6 @@ export default () => {
   const [theme, setTheme] = useState('light');
   const [isVisible, setIsVisble] = useState(true);
   const [msgCount, setMsgCount] = useState({});
-  const [comboCountClass, setComboCountClass] = useState('')
 
   const debouncedMsgCount = useDebounce(msgCount, 5000);
 
@@ -34,7 +33,6 @@ export default () => {
   };
 
   useEffect(() => {
-    setComboCountClass('');
     if (twitch) {
       // Called every time the bot connects to Twitch chat
       const onConnectedHandler = (addr, port) => {
@@ -52,14 +50,11 @@ export default () => {
         const userId = authentication.getUserId();
         const isCurrentUser = messageUserId === userId;
 
-        
         if (isCurrentUser) {
-          setComboCountClass('comboShake');
           setMsgCount((count) => ({
             ...count,
             [userId]: count[userId] ? count[userId] + 1 : 1,
           }));
-          setComboCountClass('comboShakeEnd');
         }
       };
 
@@ -110,7 +105,7 @@ export default () => {
   const getComboCount = () => msgCount[authentication.getUserId()] || 0;
 
   if (finishedLoading && isVisible) {
-    return <ComboCount  key={Date.now()} count={getComboCount()} comboCountClass={comboCountClass} />;
+    return <ComboCount count={getComboCount()} />;
   }
 
   return <div className="App" />;
