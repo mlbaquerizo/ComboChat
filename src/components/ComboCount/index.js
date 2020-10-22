@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import './countShake.css';
+import './ComboCount.css';
 
 const ComboCount = ({ count, comboCountClass }) => (
   <div
@@ -30,7 +30,7 @@ const ComboCount = ({ count, comboCountClass }) => (
 );
 
 ComboCount.propTypes = {
-  count: PropTypes.objectOf(PropTypes.number).isRequired,
+  count: PropTypes.number.isRequired,
   comboCountClass: PropTypes.string,
 };
 
