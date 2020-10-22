@@ -27,7 +27,7 @@ const ComboCount = ({ count }) => (
 );
 
 ComboCount.propTypes = {
-  count: PropTypes.objectOf(PropTypes.number).isRequired,
+  count: PropTypes.number.isRequired,
 };
 
 export default ComboCount;

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import ComboCount from '../ComboCount';
 import Authentication from '../../util/Authentication/Authentication';
 import ChatBot from '../../util/ChatBot/ChatBot';
+import useDebounce from '../../util/hooks/useDebounce';
 import './App.css';
 
 const authentication = new Authentication();
@@ -18,6 +19,8 @@ export default () => {
   const [theme, setTheme] = useState('light');
   const [isVisible, setIsVisble] = useState(true);
   const [msgCount, setMsgCount] = useState({});
+
+  const debouncedMsgCount = useDebounce(msgCount, 5000);
 
   const contextUpdate = (context, delta) => {
     if (delta.includes('theme')) {
@@ -92,6 +95,12 @@ export default () => {
       };
     }
   }, []);
+
+  useEffect(() => {
+    if (debouncedMsgCount) {
+      setMsgCount({});
+    }
+  }, [debouncedMsgCount]);
 
   const getComboCount = () => msgCount[authentication.getUserId()] || 0;
 
