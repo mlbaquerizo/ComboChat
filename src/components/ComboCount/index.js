@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import './countShake.css';
 
 const ComboCount = ({ count }) => (
   <div
@@ -13,16 +14,18 @@ const ComboCount = ({ count }) => (
       paddingBottom: '15px',
     }}
   >
-    <h1
-      style={{
-        textAlign: 'center',
-        fontSize: '100px',
-        color: 'white',
-        marginBottom: '2px',
-      }}
-    >
-      {count}
-    </h1>
+    <div className={comboCountClass}></div>
+      <h1
+        style={{
+          textAlign: 'center',
+          fontSize: '100px',
+          color: 'white',
+          marginBottom: '2px',
+        }}
+      >
+        {count}
+      </h1>
+    </div>
   </div>
 );
 
