@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import './ComboCount.css';
 
 const ComboCount = ({ count, comboCountClass }) => (
   <div
