@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import './countShake.css';
 
-const ComboCount = ({ count }) => (
+const ComboCount = ({ count, comboCountClass }) => (
   <div
     className="circleContainer"
     style={{
@@ -14,7 +14,7 @@ const ComboCount = ({ count }) => (
       paddingBottom: '15px',
     }}
   >
-    <div className={comboCountClass}></div>
+    <div className={comboCountClass}>
       <h1
         style={{
           textAlign: 'center',
@@ -31,6 +31,11 @@ const ComboCount = ({ count }) => (
 
 ComboCount.propTypes = {
   count: PropTypes.objectOf(PropTypes.number).isRequired,
+  comboCountClass: PropTypes.string,
+};
+
+ComboCount.defaultProps = {
+  comboCountClass: '',
 };
 
 export default ComboCount;
